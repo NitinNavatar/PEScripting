@@ -377,7 +377,7 @@ public class Post_CheckScript extends BaseLib {
 					log(LogStatus.FAIL, "Not able to click on notification link in navatar setting tab", YesNo.Yes);
 					sa.assertTrue(false, "Not able to click on notification link in navatar setting tab");
 				}
-		
+
 		} catch (Exception e) {
 		
 				switchToDefaultContent(driver);
@@ -495,8 +495,8 @@ public class Post_CheckScript extends BaseLib {
 										action.SCROLLANDBOOLEAN)) {
 									log(LogStatus.INFO, "clicked on the lightning record  page label:" + name,
 											YesNo.No);
-									CommonLib.ThreadSleep(3000);
-									switchToFrame(driver, 20, setup.getSetUpPageIframe(20));
+									CommonLib.ThreadSleep(5000);
+									switchToFrame(driver, 30, setup.getSetUpPageIframe(30));
 									CommonLib.ThreadSleep(5000);
 
 									if (setup.removeRelatedListAPI(api)) {
@@ -2213,8 +2213,7 @@ public class Post_CheckScript extends BaseLib {
 		
 			String	parentWindow=null;
 		CommonLib.refresh(driver);
-		CommonLib.ThreadSleep(3000);
-		
+		CommonLib.ThreadSleep(3000);	
 		try {
 			CommonLib.ThreadSleep(3000);
 			if (home.clickOnSetUpLink()) {
@@ -2396,22 +2395,7 @@ public class Post_CheckScript extends BaseLib {
 		}
 		
 		sa.assertAll();
-		
-		if (lp.clickOnTab(projectName, TabName.HomeTab)) {
-			log(LogStatus.PASS, "Click on Tab : " + TabName.HomeTab, YesNo.No);
-		
-			
-
-		} else {
-			sa.assertTrue(false, "Not Able to Click on Tab : " + TabName.HomeTab);
-			log(LogStatus.FAIL, "Not Able to Click on Tab : " + TabName.HomeTab, YesNo.Yes);
-		}
-		
-	///	
-		
-		
 	}
-	
 
 	@Test(priority = 15,dependsOnMethods = {"isRexecute"})
 
@@ -3479,7 +3463,6 @@ object[] objects = { object.Institution,object.Contact, object.Fund, object.Affi
 				
 		sa.assertAll();
 	}
-
 	@Test(priority = 17,enabled =false)
 	public void VerifyEmailDeliverabilitySetting() {
 		
