@@ -484,11 +484,13 @@ public class Post_CheckScript extends BaseLib {
               							log(LogStatus.PASS, "clicked on page layout of object feature of "
               									+ api + " object", YesNo.Yes);
 							List<WebElement> allElements = setup.getAllPageLayoutList();
+							String name = null;
 							int no = allElements.size();
 							 for(int i=0;i<no;i++) {
-							String name = null;
+							
 							try {
 								allElements = setup.getAllPageLayoutList();
+								if(allElements.size()>0) {
 								WebElement labelElement = allElements.get(i);
 								name = labelElement.getText();
 								if (click(driver, labelElement, "lightning record  page label :" + name,
@@ -517,8 +519,15 @@ public class Post_CheckScript extends BaseLib {
 											"Not able to clicked on the page layout of  page label:" + name);
 
 								}
+								}else {
+									log(LogStatus.ERROR, "Not able to remove Related list of page layout after  :"+name+" layout of object :"+api, YesNo.Yes);
+									System.out.println("Not able to remove Related list of page layout after  :"+name+" layout of object :"+api);
+									driver.navigate().back();
+								}
 							} catch (Exception e) {
 								driver.navigate().back();
+								
+								
 								
 							}
 							 }
@@ -561,7 +570,6 @@ public class Post_CheckScript extends BaseLib {
 	}
 					
 	@Test(priority = 6,dependsOnMethods = {"isRexecute"})
-
 	public void VerifyHelpmenutodisplaycustomdetails() {
 
 		String projectName = "";
@@ -691,7 +699,6 @@ public class Post_CheckScript extends BaseLib {
 }
 	
 	@Test(priority = 7,dependsOnMethods = {"isRexecute"})
-
 	public void verifyAcuityTabAddedInObjects() {
 		HomePageBusineesLayer home = new HomePageBusineesLayer(driver);
 		SetupPageBusinessLayer setup = new SetupPageBusinessLayer(driver);
@@ -2202,7 +2209,7 @@ public class Post_CheckScript extends BaseLib {
 	}
 
 	@Test(priority = 15,dependsOnMethods = {"isRexecute"})
-	public void verifyAddNotificationOnHomePageAndRemoveTodayTaskNEvents () {
+	public void verifyAddNotificationOnHomePageAndRemoveTodayTaskNEvents() {
 
 		String projectName = "";
 		LoginPageBusinessLayer lp = new LoginPageBusinessLayer(driver);
@@ -2210,7 +2217,7 @@ public class Post_CheckScript extends BaseLib {
 		HomePageBusineesLayer home = new HomePageBusineesLayer(driver);
 		SetupPageBusinessLayer setup =new SetupPageBusinessLayer(driver);
 		LightningAppBuilderPageBusinessLayer light =new LightningAppBuilderPageBusinessLayer(driver);
-		
+		boolean listView=true;
 			String	parentWindow=null;
 		CommonLib.refresh(driver);
 		CommonLib.ThreadSleep(3000);	
@@ -2219,7 +2226,36 @@ public class Post_CheckScript extends BaseLib {
 			if (home.clickOnSetUpLink()) {
 
 				parentWindow = switchOnWindow(driver);
-				if (parentWindow == null) {
+				if (parentWindow != null) {
+					
+					if (setup.searchStandardOrCustomObject(environment, mode, object.Lightning_App_Builder)) {
+						log(LogStatus.INFO, "click on Object : " + object.Lightning_App_Builder, YesNo.No);
+						ThreadSleep(5000);
+						switchToFrame(driver, 60, setup.getSetUpPageIframe(120));
+						ThreadSleep(5000);
+						
+						if(light.createNewListView("HomePageListView", "Type", "equals", "Home Page")) {
+						
+							log(LogStatus.INFO, "abel to create 'HomePageListView' list view ", YesNo.No);
+							ThreadSleep(5000);
+							driver.close();
+							driver.switchTo().window(parentWindow);
+							parentWindow=null;
+							
+							
+						}else {
+							log(LogStatus.ERROR, "Not able to create 'HomePageListView' list view ", YesNo.Yes);
+							sa.assertTrue(false, "Not able to create 'HomePageListView' list view ");
+						}
+						
+					
+						
+					} else {
+						log(LogStatus.ERROR, "Not able to search/click on " + object.Lightning_App_Builder, YesNo.Yes);
+						sa.assertTrue(false, "Not able to search/click on " + object.Lightning_App_Builder);
+					}
+					
+				}else {
 					sa.assertTrue(false,
 							"No new window is open after click on setup link in lighting mode so cannot create CRM User2");
 					log(LogStatus.FAIL,
@@ -2227,22 +2263,40 @@ public class Post_CheckScript extends BaseLib {
 							YesNo.Yes);
 					exit("No new window is open after click on setup link in lighting mode so cannot create CRM User2");
 				}
+			}else {
+				sa.assertTrue(false,
+						"Not able to click on setup link");
+				log(LogStatus.FAIL,
+						"Not able to click on setup link",
+						YesNo.Yes);
 			}
-		if (setup.searchStandardOrCustomObject(environment, mode, object.Lightning_App_Builder)) {
-			log(LogStatus.INFO, "click on Object : " + object.Lightning_App_Builder, YesNo.No);
-			ThreadSleep(5000);
-			switchToFrame(driver, 60, setup.getSetUpPageIframe(120));
-			ThreadSleep(5000);
-			
-			if(light.createNewListView("HomePageListView", "Type", "equals", "Home Page")) {
-			
-				log(LogStatus.INFO, "abel to create 'HomePageListView' list view ", YesNo.No);
-				ThreadSleep(10000);
-				switchToDefaultContent(driver);
-				ThreadSleep(5000);
-				switchToFrame(driver, 60, setup.getSetUpPageIframe(120));
-				ThreadSleep(5000);
 				
+			} catch (Exception e) {
+				if (parentWindow != null) {
+
+					driver.close();
+					driver.switchTo().window(parentWindow);
+					parentWindow=null;
+				}
+				
+			}
+			
+		
+		CommonLib.refresh(driver);
+		try {
+			CommonLib.ThreadSleep(3000);
+			if (home.clickOnSetUpLink()) {
+
+				parentWindow = switchOnWindow(driver);
+				if (parentWindow != null) {
+					
+					if (setup.searchStandardOrCustomObject(environment, mode, object.Lightning_App_Builder)) {
+						log(LogStatus.INFO, "click on Object : " + object.Lightning_App_Builder, YesNo.No);
+						ThreadSleep(5000);
+						switchToFrame(driver, 60, setup.getSetUpPageIframe(120));
+						ThreadSleep(5000);
+						
+		
 				String api=null;
 				String xPath =null;
 				List<WebElement> allElements = light.getAllHomepageList();
@@ -2308,31 +2362,47 @@ public class Post_CheckScript extends BaseLib {
 							if (edit.addNotificationComponent(projectName, "Navatar Notification", "Notifications",
 									"Z (Do not use) Navatar Notification Popup")) {
 								log(LogStatus.PASS, "Component Added to Home Page: Navatar Notification", YesNo.No);
+								if (setup.searchStandardOrCustomObject(environment, mode, object.Lightning_App_Builder)) {
+									log(LogStatus.INFO, "click on Object : " + object.Lightning_App_Builder, YesNo.No);
+									CommonLib.ThreadSleep(3000);
+									switchToDefaultContent(driver);
+									ThreadSleep(5000);
+									switchToFrame(driver, 60, setup.getSetUpPageIframe(120));
+									ThreadSleep(5000);
+								}
 							} else {
 								log(LogStatus.FAIL, "Component Not Able to Add to Home Page: Navatar Notification", YesNo.Yes);
 								sa.assertTrue(false, "Component Not Able to Add to Home Page: Navatar Notification");
 							}
-							
-							if (setup.searchStandardOrCustomObject(environment, mode, object.Lightning_App_Builder)) {
-								log(LogStatus.INFO, "click on Object : " + object.Lightning_App_Builder, YesNo.No);
-								CommonLib.ThreadSleep(3000);
-								switchToDefaultContent(driver);
-								ThreadSleep(5000);
-								switchToFrame(driver, 60, setup.getSetUpPageIframe(120));
-								ThreadSleep(5000);
-							}else {
-								log(LogStatus.FAIL,
-										"Not able to open object : "+ object.Lightning_App_Builder,
-										YesNo.Yes);
-								sa.assertTrue(false,
-										"Not able to open object : "+ object.Lightning_App_Builder);
-							}
-							
-							
-
-						
 					
-				} catch (Exception e) {							
+				} catch (Exception e) {		
+					
+					driver.close();
+					driver.switchTo().window(parentWindow);
+					parentWindow=null;
+					CommonLib.ThreadSleep(3000);
+					if (home.clickOnSetUpLink()) {
+
+						parentWindow = switchOnWindow(driver);
+						if (parentWindow != null) {
+							
+						}else {
+							sa.assertTrue(false,
+									"No new window is open after click on setup in execption on page action");
+							log(LogStatus.FAIL,
+									"No new window is open after click on setup in execption on page action",
+									YesNo.Yes);
+							exit("No new window is open after click on setup link in lighting mode so cannot create CRM User2");
+						}
+					}else {
+						sa.assertTrue(false,
+								"Not able to click on setup link execption on page action");
+						log(LogStatus.FAIL,
+								"Not able to click on setup link execption on page action",
+								YesNo.Yes);
+					}
+						
+					CommonLib.ThreadSleep(3000);
 					if (setup.searchStandardOrCustomObject(environment, mode, object.Lightning_App_Builder)) {
 						log(LogStatus.INFO, "click on Object : " + object.Lightning_App_Builder, YesNo.No);
 						CommonLib.ThreadSleep(3000);
@@ -2355,34 +2425,43 @@ public class Post_CheckScript extends BaseLib {
 				 
 				}else {
 					log(LogStatus.FAIL,
-							"No lighting Home page found ",
+							"No lighting Home page present to perform action ",
 							YesNo.Yes);
 					sa.assertTrue(false,
-							"No lighting Home page found ");
+							"No lighting Home page present to perform action ");
 				}
 				
+					} else {
+						log(LogStatus.ERROR, "Not able to search/click on " + object.Lightning_App_Builder, YesNo.Yes);
+						sa.assertTrue(false, "Not able to search/click on " + object.Lightning_App_Builder);
+					}
+					
+				}else {
+					sa.assertTrue(false,
+							"No new window is open after click on setup link in lighting mode so cannot create CRM User2");
+					log(LogStatus.FAIL,
+							"No new window is open after click on setup link in lighting mode so cannot create CRM User2",
+							YesNo.Yes);
+					exit("No new window is open after click on setup link in lighting mode so cannot create CRM User2");
+				}
 			}else {
-				log(LogStatus.ERROR, "Not able to create 'HomePageListView' list view ", YesNo.Yes);
-				sa.assertTrue(false, "Not able to create 'HomePageListView' list view ");
+				sa.assertTrue(false,
+						"Not able to click on setup link");
+				log(LogStatus.FAIL,
+						"Not able to click on setup link",
+						YesNo.Yes);
 			}
-			
-			
-			
-		} else {
-			log(LogStatus.ERROR, "Not able to search/click on " + object.Lightning_App_Builder, YesNo.Yes);
-			sa.assertTrue(false, "Not able to search/click on " + object.Lightning_App_Builder);
-		}
-		
-		} catch (Exception e) {
-			if (parentWindow != null) {
+				
+			} catch (Exception e) {
+				if (parentWindow != null) {
 
-				driver.close();
-				driver.switchTo().window(parentWindow);
-				parentWindow=null;
+					driver.close();
+					driver.switchTo().window(parentWindow);
+					parentWindow=null;
+				}
+				
 			}
-			
-		}
-		
+
 		if (parentWindow != null) {
 
 			driver.close();
@@ -2395,7 +2474,6 @@ public class Post_CheckScript extends BaseLib {
 	}
 
 	@Test(priority = 13,dependsOnMethods = {"isRexecute"})
-
 	public void VerifyModifyingIsTouchpointPackageField () {
 
 		String projectName = "";
@@ -3534,5 +3612,3 @@ object[] objects = { object.Institution,object.Contact, object.Fund, object.Affi
 	}
 	
 }
-
-	
